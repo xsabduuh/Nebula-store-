@@ -1,1 +1,1406 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NebulaStore | متجر النيبولا - أي شيء تتخيله</title>
 
+    <!-- ========== CSS ========== -->
+    <style>
+        /* ==================== CSS Variables & Reset ==================== */
+        :root {
+            --bg-deep: #0a0a0f;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --glass: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-hover: rgba(255, 255, 255, 0.07);
+            --neon-cyan: #00f0ff;
+            --neon-purple: #b347ea;
+            --neon-pink: #ff2d95;
+            --neon-blue: #4d7cff;
+            --text-primary: #e8e8f0;
+            --text-secondary: #a0a0b8;
+            --text-muted: #6a6a7e;
+            --radius-sm: 12px;
+            --radius-md: 20px;
+            --radius-lg: 28px;
+            --radius-xl: 36px;
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+            --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            --shadow-glow-cyan: 0 0 30px rgba(0, 240, 255, 0.25), 0 0 60px rgba(0, 240, 255, 0.08);
+            --shadow-glow-purple: 0 0 30px rgba(179, 71, 234, 0.25), 0 0 60px rgba(179, 71, 234, 0.08);
+            --shadow-glow-pink: 0 0 30px rgba(255, 45, 149, 0.25), 0 0 60px rgba(255, 45, 149, 0.08);
+            --font-main: 'Segoe UI', 'Cairo', system-ui, -apple-system, sans-serif;
+            --font-display: 'Georgia', 'Noto Naskh Arabic', serif;
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+            font-size: 16px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 20px;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            line-height: 1.7;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            cursor: default;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* ==================== 3D Canvas Background ==================== */
+        #three-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.85;
+        }
+
+        /* ==================== Main Content Wrapper ==================== */
+        .main-content {
+            position: relative;
+            z-index: 1;
+            pointer-events: auto;
+        }
+
+        /* ==================== Glassmorphism Utility ==================== */
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            transition: all var(--transition-smooth);
+        }
+        .glass-panel:hover {
+            background: var(--glass-hover);
+            border-color: rgba(255, 255, 255, 0.16);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        /* ==================== Header / Navbar ==================== */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 12px 20px;
+            transition: all var(--transition-smooth);
+        }
+        .header.scrolled {
+            background: rgba(10, 10, 15, 0.7);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 8px 20px;
+        }
+        .nav-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple), var(--neon-pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 18px rgba(0, 240, 255, 0.4));
+            animation: logoShimmer 4s ease-in-out infinite;
+            text-decoration: none;
+            font-family: var(--font-display);
+        }
+        @keyframes logoShimmer {
+            0%,
+            100% {
+                filter: drop-shadow(0 0 18px rgba(0, 240, 255, 0.4));
+            }
+            33% {
+                filter: drop-shadow(0 0 24px rgba(179, 71, 234, 0.5));
+            }
+            66% {
+                filter: drop-shadow(0 0 22px rgba(255, 45, 149, 0.45));
+            }
+        }
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            align-items: center;
+        }
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            position: relative;
+            transition: color var(--transition-fast);
+            padding: 6px 0;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--neon-cyan);
+            border-radius: 10px;
+            transition: width var(--transition-smooth);
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+        .nav-links a:hover {
+            color: #fff;
+        }
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        .cart-btn {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(179, 71, 234, 0.15));
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 10px 22px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            font-family: var(--font-main);
+            white-space: nowrap;
+        }
+        .cart-btn:hover {
+            border-color: var(--neon-cyan);
+            box-shadow: var(--shadow-glow-cyan);
+            transform: translateY(-2px);
+        }
+        .cart-btn .cart-count {
+            background: var(--neon-pink);
+            color: #fff;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            margin-right: 6px;
+            font-weight: 700;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 45, 149, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 0 14px rgba(255, 45, 149, 0);
+            }
+        }
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            z-index: 101;
+        }
+        .menu-toggle span {
+            display: block;
+            width: 26px;
+            height: 2.5px;
+            background: #fff;
+            margin: 6px 0;
+            border-radius: 10px;
+            transition: all var(--transition-fast);
+        }
+
+        /* ==================== Hero Section ==================== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 120px 20px 60px;
+            position: relative;
+        }
+        .hero-content {
+            max-width: 800px;
+            position: relative;
+            z-index: 2;
+        }
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: var(--neon-cyan);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            animation: fadeInUp 1s ease forwards;
+        }
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 900;
+            line-height: 1.15;
+            margin-bottom: 20px;
+            font-family: var(--font-display);
+            animation: fadeInUp 1s ease 0.15s forwards;
+            opacity: 0;
+            animation-fill-mode: forwards;
+        }
+        .hero h1 .gradient-text {
+            background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-purple) 50%, var(--neon-pink) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% 200%;
+            animation: gradientShift 5s ease-in-out infinite;
+        }
+        @keyframes gradientShift {
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+            25% {
+                background-position: 100% 0%;
+            }
+            50% {
+                background-position: 100% 100%;
+            }
+            75% {
+                background-position: 0% 100%;
+            }
+        }
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 35px;
+            animation: fadeInUp 1s ease 0.3s forwards;
+            opacity: 0;
+            animation-fill-mode: forwards;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .hero-cta {
+            display: inline-flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+            animation: fadeInUp 1s ease 0.45s forwards;
+            opacity: 0;
+            animation-fill-mode: forwards;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+            color: #000;
+            padding: 15px 35px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+            box-shadow: 0 8px 30px rgba(0, 200, 255, 0.3);
+            letter-spacing: 0.5px;
+            font-family: var(--font-main);
+        }
+        .btn-primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 44px rgba(0, 220, 255, 0.45);
+        }
+        .btn-outline {
+            background: transparent;
+            color: #fff;
+            padding: 15px 35px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            border: 1.5px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+            font-family: var(--font-main);
+        }
+        .btn-outline:hover {
+            border-color: var(--neon-purple);
+            box-shadow: var(--shadow-glow-purple);
+            background: rgba(179, 71, 234, 0.08);
+            transform: translateY(-4px);
+        }
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounceDown 2s infinite;
+            z-index: 2;
+        }
+        .scroll-indicator .arrow {
+            width: 30px;
+            height: 30px;
+            border-right: 2px solid rgba(255, 255, 255, 0.6);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.6);
+            transform: rotate(45deg);
+            border-radius: 3px;
+        }
+        @keyframes bounceDown {
+            0%,
+            100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            50% {
+                transform: translateX(-50%) translateY(15px);
+            }
+        }
+
+        /* ==================== Products Section ==================== */
+        .section {
+            padding: 80px 20px;
+            max-width: 1300px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+        .section-title {
+            text-align: center;
+            margin-bottom: 55px;
+        }
+        .section-title h2 {
+            font-size: clamp(2rem, 4vw, 2.8rem);
+            font-weight: 800;
+            margin-bottom: 10px;
+            font-family: var(--font-display);
+        }
+        .section-title .accent {
+            color: var(--neon-cyan);
+        }
+        .section-title p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 28px;
+        }
+        /* ==================== 3D Tilt Product Card ==================== */
+        .product-card {
+            perspective: 1200px;
+            cursor: pointer;
+            position: relative;
+            z-index: 1;
+        }
+        .product-card-inner {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
+            padding: 30px 25px;
+            transition: transform 0.15s ease-out, box-shadow var(--transition-smooth), border-color var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
+        .product-card-inner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg,
+                    transparent,
+                    rgba(0, 240, 255, 0.06),
+                    transparent,
+                    rgba(179, 71, 234, 0.06),
+                    transparent);
+            animation: cardShine 8s linear infinite;
+            opacity: 0;
+            transition: opacity var(--transition-smooth);
+            pointer-events: none;
+            z-index: 0;
+        }
+        @keyframes cardShine {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .product-card:hover .product-card-inner::before {
+            opacity: 1;
+        }
+        .product-card:hover .product-card-inner {
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 55px rgba(0, 0, 0, 0.5), var(--shadow-glow-cyan);
+        }
+        .product-card-inner>* {
+            position: relative;
+            z-index: 1;
+        }
+        .product-emoji {
+            font-size: 4rem;
+            display: block;
+            text-align: center;
+            margin-bottom: 18px;
+            filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.3));
+            transition: transform var(--transition-bounce);
+        }
+        .product-card:hover .product-emoji {
+            transform: scale(1.15) translateZ(30px);
+        }
+        .product-tag {
+            display: inline-block;
+            background: rgba(0, 240, 255, 0.12);
+            color: var(--neon-cyan);
+            padding: 5px 14px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        .product-card h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+        .product-card .desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        .product-card .price-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .product-card .price {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .btn-add-cart {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            font-family: var(--font-main);
+        }
+        .btn-add-cart:hover {
+            background: var(--neon-cyan);
+            color: #000;
+            border-color: var(--neon-cyan);
+            box-shadow: var(--shadow-glow-cyan);
+        }
+        .btn-add-cart .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: scale(0);
+            animation: rippleEffect 0.6s ease-out;
+            pointer-events: none;
+        }
+        @keyframes rippleEffect {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        .product-card .glow-dot {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--neon-pink);
+            box-shadow: 0 0 15px var(--neon-pink), 0 0 30px var(--neon-pink);
+            animation: glowPulse 1.5s infinite;
+            z-index: 2;
+        }
+        @keyframes glowPulse {
+            0%,
+            100% {
+                box-shadow: 0 0 15px var(--neon-pink), 0 0 30px var(--neon-pink);
+            }
+            50% {
+                box-shadow: 0 0 25px var(--neon-pink), 0 0 50px var(--neon-pink), 0 0 70px rgba(255, 45, 149, 0.5);
+            }
+        }
+
+        /* ==================== Features Section ==================== */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 24px;
+        }
+        .feature-card {
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: 30px 22px;
+            text-align: center;
+            transition: all var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45);
+        }
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+        .feature-card h3 {
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+        .feature-card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* ==================== Cart Sidebar ==================== */
+        .cart-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--transition-smooth);
+            backdrop-filter: blur(4px);
+        }
+        .cart-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .cart-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 400px;
+            max-width: 90vw;
+            height: 100%;
+            background: rgba(15, 15, 25, 0.95);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            z-index: 201;
+            transform: translateX(100%);
+            transition: transform var(--transition-smooth);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+            overflow-y: auto;
+        }
+        .cart-sidebar.active {
+            transform: translateX(0);
+        }
+        .cart-sidebar h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            font-family: var(--font-display);
+        }
+        .cart-close {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: color var(--transition-fast);
+            z-index: 5;
+        }
+        .cart-close:hover {
+            color: var(--neon-pink);
+        }
+        .cart-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px;
+            background: var(--glass);
+            border-radius: var(--radius-md);
+            margin-bottom: 12px;
+            border: 1px solid var(--glass-border);
+            transition: all var(--transition-fast);
+        }
+        .cart-item:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        .cart-item-emoji {
+            font-size: 2.2rem;
+        }
+        .cart-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .cart-item-info h4 {
+            font-size: 0.95rem;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .cart-item-info .price {
+            color: var(--neon-cyan);
+            font-weight: 700;
+        }
+        .cart-remove {
+            background: rgba(255, 45, 149, 0.2);
+            border: none;
+            color: var(--neon-pink);
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            transition: all var(--transition-fast);
+            font-family: var(--font-main);
+        }
+        .cart-remove:hover {
+            background: rgba(255, 45, 149, 0.4);
+        }
+        .cart-total {
+            margin-top: auto;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+        .cart-total .total-amount {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: block;
+            margin: 10px 0;
+        }
+        .btn-checkout {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+            font-family: var(--font-main);
+        }
+        .btn-checkout:hover {
+            box-shadow: 0 10px 35px rgba(255, 45, 149, 0.4);
+            transform: translateY(-3px);
+        }
+        .cart-empty {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 40px 0;
+            font-size: 1.1rem;
+        }
+
+        /* ==================== Footer ==================== */
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 2;
+        }
+        .footer .heart {
+            color: var(--neon-pink);
+            animation: heartBeat 1.5s infinite;
+            display: inline-block;
+        }
+        @keyframes heartBeat {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            15% {
+                transform: scale(1.3);
+            }
+            30% {
+                transform: scale(1);
+            }
+        }
+
+        /* ==================== Toast Notification ==================== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(120px);
+            background: rgba(20, 20, 30, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 14px 28px;
+            border-radius: 50px;
+            z-index: 300;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: transform var(--transition-bounce);
+            pointer-events: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ==================== Responsive ==================== */
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 75vw;
+                height: 100vh;
+                background: rgba(10, 10, 18, 0.97);
+                backdrop-filter: blur(30px);
+                flex-direction: column;
+                justify-content: center;
+                gap: 35px;
+                transition: right var(--transition-smooth);
+                z-index: 100;
+                border-left: 1px solid rgba(255, 255, 255, 0.06);
+            }
+            .nav-links.active {
+                right: 0;
+                display: flex;
+            }
+            .menu-toggle {
+                display: block;
+                z-index: 102;
+            }
+            .menu-toggle.active span:nth-child(1) {
+                transform: rotate(45deg) translate(6px, 6px);
+            }
+            .menu-toggle.active span:nth-child(2) {
+                opacity: 0;
+            }
+            .menu-toggle.active span:nth-child(3) {
+                transform: rotate(-45deg) translate(6px, -6px);
+            }
+            .products-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .features-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+            }
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .cart-sidebar {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+        @media (max-width: 400px) {
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            .hero-cta {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== Three.js 3D Canvas ==================== -->
+    <canvas id="three-canvas"></canvas>
+
+    <!-- ==================== Toast ==================== -->
+    <div class="toast" id="toast">✨ تمت الإضافة إلى السلة</div>
+
+    <!-- ==================== Cart Overlay ==================== -->
+    <div class="cart-overlay" id="cartOverlay"></div>
+
+    <!-- ==================== Cart Sidebar ==================== -->
+    <aside class="cart-sidebar" id="cartSidebar">
+        <button class="cart-close" id="cartClose" aria-label="إغلاق">&times;</button>
+        <h3>🛒 سلة التسوق</h3>
+        <div id="cartItems">
+            <p class="cart-empty">السلة فارغة حالياً 🪐</p>
+        </div>
+        <div class="cart-total" id="cartTotal" style="display:none;">
+            <span>المجموع:</span>
+            <span class="total-amount" id="totalAmount">0</span>
+            <button class="btn-checkout">✨ إتمام الشراء</button>
+        </div>
+    </aside>
+
+    <!-- ==================== Main Content ==================== -->
+    <div class="main-content">
+
+        <!-- Header -->
+        <header class="header" id="header">
+            <nav class="nav-container">
+                <a href="#" class="logo">🪐 NebulaStore</a>
+                <button class="menu-toggle" id="menuToggle" aria-label="قائمة">
+                    <span></span><span></span><span></span>
+                </button>
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="#hero">الرئيسية</a></li>
+                    <li><a href="#products">المنتجات</a></li>
+                    <li><a href="#features">المميزات</a></li>
+                    <li>
+                        <button class="cart-btn" id="cartBtn">
+                            <span class="cart-count" id="cartCount">0</span> السلة
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Hero -->
+        <section class="hero" id="hero">
+            <div class="hero-content">
+                <span class="hero-badge">🚀 تكنولوجيا المستقبل</span>
+                <h1>متجر <span class="gradient-text">النيبولا</span><br>أي شيء تتخيله</h1>
+                <p>أول متجر في العالم يبيع كل ما يخطر ببالك. من الذكاء الاصطناعي الكمي إلى بلورات الطاقة اللانهائية — إذا حلمت به، فنحن نبيعه.</p>
+                <div class="hero-cta">
+                    <a href="#products" class="btn-primary">🛍 استكشف المنتجات</a>
+                    <a href="#features" class="btn-outline">🔮 اكتشف المميزات</a>
+                </div>
+            </div>
+            <div class="scroll-indicator"><div class="arrow"></div></div>
+        </section>
+
+        <!-- Products -->
+        <section class="section" id="products">
+            <div class="section-title">
+                <h2>🪐 <span class="accent">منتجات</span> من عالم آخر</h2>
+                <p>اختر ما تشتهيه نفسك... كل شيء متاح في NebulaStore</p>
+            </div>
+            <div class="products-grid" id="productsGrid">
+                <!-- تُملأ بـ JavaScript -->
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section class="section" id="features">
+            <div class="section-title">
+                <h2>🔮 <span class="accent">لماذا</span> نحن؟</h2>
+                <p>تقنيات متطورة تجعل تجربة التسوق خيالية</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <span class="feature-icon">⚡</span>
+                    <h3>توصيل فوري</h3>
+                    <p>نستخدم تقنية النقل الكمي لتوصيل منتجك في أقل من ثانية بعد الطلب.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🛡️</span>
+                    <h3>ضمان أبدي</h3>
+                    <p>جميع منتجاتنا تأتي مع ضمان لا نهائي عبر الأكوان المتوازية.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🧬</span>
+                    <h3>منتجات مخصصة</h3>
+                    <p>حمضك النووي يُستخدم لتخصيص كل منتج ليناسبك أنت وحدك.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🌌</span>
+                    <h3>شحن كوني</h3>
+                    <p>نشحن إلى أي مكان في المجرة... وحتى خارجها. المريخ؟ زحل؟ أندروميدا؟ لا مشكلة.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🤖</span>
+                    <h3>دعم ذكي</h3>
+                    <p>مساعدنا الذكي يفهم احتياجاتك قبل أن تعبر عنها. حرفياً.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">💎</span>
+                    <h3>دفع آمن</h3>
+                    <p>نقبل كل العملات: بيتكوين، إيثيريوم، كريديتات المجرة، وحتى المقايضة.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>صُنع بـ <span class="heart">❤️</span> في مجرة درب التبانة | © 2026 NebulaStore | كل الحقوق محفوظة عبر الأبعاد</p>
+        </footer>
+
+    </div>
+
+    <!-- ==================== Three.js CDN ==================== -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+            }
+        }
+    </script>
+
+    <!-- ==================== JavaScript ==================== -->
+    <script type="module">
+        import * as THREE from 'three';
+
+        // ==================== DOM Elements ====================
+        const canvas = document.getElementById('three-canvas');
+        const header = document.getElementById('header');
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+        const cartBtn = document.getElementById('cartBtn');
+        const cartSidebar = document.getElementById('cartSidebar');
+        const cartOverlay = document.getElementById('cartOverlay');
+        const cartClose = document.getElementById('cartClose');
+        const cartItems = document.getElementById('cartItems');
+        const cartCount = document.getElementById('cartCount');
+        const cartTotal = document.getElementById('cartTotal');
+        const totalAmount = document.getElementById('totalAmount');
+        const toast = document.getElementById('toast');
+        const productsGrid = document.getElementById('productsGrid');
+
+        // ==================== Cart State ====================
+        let cart = JSON.parse(localStorage.getItem('nebulaCart')) || [];
+
+        function saveCart() {
+            localStorage.setItem('nebulaCart', JSON.stringify(cart));
+        }
+
+        function updateCartUI() {
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.textContent = count;
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<p class="cart-empty">السلة فارغة حالياً 🪐</p>';
+                cartTotal.style.display = 'none';
+            } else {
+                cartItems.innerHTML = cart.map((item, i) => `
+                    <div class="cart-item">
+                        <span class="cart-item-emoji">${item.emoji}</span>
+                        <div class="cart-item-info">
+                            <h4>${item.name}</h4>
+                            <span class="price">${item.price} ⚛️</span>
+                        </div>
+                        <button class="cart-remove" data-index="${i}">✕</button>
+                    </div>
+                `).join('');
+                const total = cart.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
+                totalAmount.textContent = total.toFixed(1) + ' ⚛️';
+                cartTotal.style.display = 'block';
+            }
+            document.querySelectorAll('.cart-remove').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.target.dataset.index);
+                    cart.splice(index, 1);
+                    saveCart();
+                    updateCartUI();
+                    showToast('🗑️ تمت إزالة المنتج');
+                });
+            });
+        }
+
+        function addToCart(product) {
+            const existing = cart.find(item => item.id === product.id);
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            saveCart();
+            updateCartUI();
+            showToast(`✨ تمت إضافة "${product.name}" إلى السلة`);
+        }
+
+        function showToast(msg) {
+            toast.textContent = msg;
+            toast.classList.add('show');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => toast.classList.remove('show'), 2200);
+        }
+
+        function toggleCart(force) {
+            const isActive = cartSidebar.classList.contains('active');
+            const newState = typeof force === 'boolean' ? force : !isActive;
+            cartSidebar.classList.toggle('active', newState);
+            cartOverlay.classList.toggle('active', newState);
+            document.body.style.overflow = newState ? 'hidden' : '';
+        }
+
+        cartBtn.addEventListener('click', () => toggleCart(true));
+        cartClose.addEventListener('click', () => toggleCart(false));
+        cartOverlay.addEventListener('click', () => toggleCart(false));
+
+        // ==================== Products Data ====================
+        const products = [
+            { id: 'p1', name: 'مساعد الذكاء الكمي', emoji: '🧠', tag: 'الأكثر مبيعاً', price: '2999.9',
+                desc: 'وعي اصطناعي متكامل يسكن في عقلك ويساعدك في كل شيء. يفهم أفكارك قبل أن تنطق بها.' },
+            { id: 'p2', name: 'شاشة هولوغرافية', emoji: '📟', tag: 'جديد', price: '1499.5',
+                desc: 'شاشة ثلاثية الأبعاد تطفو في الهواء. قابلة للطي إلى حجم حبة دواء. دقة 16K.' },
+            { id: 'p3', name: 'سوار الواجهة العصبية', emoji: '⌚', tag: 'حصري', price: '899.0',
+                desc: 'يتصل مباشرة بدماغك. يترجم الأفكار إلى أوامر رقمية. يدعم 847 لغة.' },
+            { id: 'p4', name: 'درون مضاد الجاذبية', emoji: '🛸', tag: 'قوي', price: '4599.0',
+                desc: 'مركبة شخصية تطير بصمت تام. سرعة 600 كم/س. تعمل بالطاقة المظلمة.' },
+            { id: 'p5', name: 'خزانة الذاكرة الزمنية', emoji: '⏳', tag: 'نادر', price: '7999.0',
+                desc: 'تخزّن لحظات حياتك بتقنية الكريستال الزمني. استرجع أي ذكرى بدقة 100%.' },
+            { id: 'p6', name: 'بلورة الطاقة اللانهائية', emoji: '💎', tag: 'أسطوري', price: '9999.9',
+                desc: 'مصدر طاقة نظيف لا ينضب. بلورة واحدة تكفي لتشغيل مدينة بأكملها لمدة 10,000 عام.' },
+            { id: 'p7', name: 'بدلة التخفي الكمي', emoji: '🦎', tag: 'سري', price: '5499.0',
+                desc: 'تحيطك بحقل تشتيت ضوئي. تصبح غير مرئي تماماً. تعمل تحت الماء وفي الفضاء.' },
+            { id: 'p8', name: 'مُركّب المادة', emoji: '🍔', tag: 'عملي', price: '1299.0',
+                desc: 'يحوّل أي مادة إلى أي شيء آخر. حول الرمل إلى طعام، أو الهواء إلى ذهب. الاحتمالات لا نهائية.' },
+            { id: 'p9', name: 'بوابة النقل الآني', emoji: '🌀', tag: 'ثوري', price: '19999.0',
+                desc: 'انتقل إلى أي مكان في الكون بطرفة عين. حجم الجيب. آمنة 100% ومعتمدة من اتحاد المجرات.' },
+        ];
+
+        // ==================== Render Products ====================
+        function renderProducts() {
+            productsGrid.innerHTML = products.map(p => `
+                <div class="product-card" data-id="${p.id}">
+                    <div class="product-card-inner">
+                        <span class="glow-dot"></span>
+                        <span class="product-emoji">${p.emoji}</span>
+                        <span class="product-tag">${p.tag}</span>
+                        <h3>${p.name}</h3>
+                        <p class="desc">${p.desc}</p>
+                        <div class="price-row">
+                            <span class="price">${p.price} ⚛️</span>
+                            <button class="btn-add-cart" data-id="${p.id}">🛒 أضف للسلة</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // ==================== 3D Tilt Effect on Product Cards ====================
+            document.querySelectorAll('.product-card').forEach(card => {
+                const inner = card.querySelector('.product-card-inner');
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    const rotateX = ((y - centerY) / centerY) * -12;
+                    const rotateY = ((x - centerX) / centerX) * 12;
+                    inner.style.transform =
+                        `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`;
+                });
+                card.addEventListener('mouseleave', () => {
+                    inner.style.transform = 'rotateX(0) rotateY(0) scale(1)';
+                });
+            });
+
+            // ==================== Add to Cart Buttons with Ripple ====================
+            document.querySelectorAll('.btn-add-cart').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    const ripple = document.createElement('span');
+                    ripple.classList.add('ripple');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+                    ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+                    this.appendChild(ripple);
+                    ripple.addEventListener('animationend', () => ripple.remove());
+                    const productId = this.dataset.id;
+                    const product = products.find(p => p.id === productId);
+                    if (product) addToCart(product);
+                });
+            });
+        }
+        renderProducts();
+
+        // ==================== Three.js 3D Scene ====================
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.z = 8;
+
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+        // --- Starfield Particles ---
+        const starsGeo = new THREE.BufferGeometry();
+        const starsCount = 2200;
+        const starsPositions = new Float32Array(starsCount * 3);
+        const starsColors = new Float32Array(starsCount * 3);
+        for (let i = 0; i < starsCount; i++) {
+            const i3 = i * 3;
+            const radius = 4 + Math.random() * 20;
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.acos(2 * Math.random() - 1);
+            starsPositions[i3] = radius * Math.sin(phi) * Math.cos(theta);
+            starsPositions[i3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+            starsPositions[i3 + 2] = radius * Math.cos(phi);
+            const colorChoice = Math.random();
+            if (colorChoice < 0.33) {
+                starsColors[i3] = 0.0;
+                starsColors[i3 + 1] = 0.94;
+                starsColors[i3 + 2] = 1.0;
+            } else if (colorChoice < 0.66) {
+                starsColors[i3] = 0.7;
+                starsColors[i3 + 1] = 0.28;
+                starsColors[i3 + 2] = 0.92;
+            } else {
+                starsColors[i3] = 1.0;
+                starsColors[i3 + 1] = 0.18;
+                starsColors[i3 + 2] = 0.58;
+            }
+        }
+        starsGeo.setAttribute('position', new THREE.BufferAttribute(starsPositions, 3));
+        starsGeo.setAttribute('color', new THREE.BufferAttribute(starsColors, 3));
+        const starsMat = new THREE.PointsMaterial({
+            size: 0.04,
+            vertexColors: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+            transparent: true,
+            opacity: 0.8,
+        });
+        const stars = new THREE.Points(starsGeo, starsMat);
+        scene.add(stars);
+
+        // --- Floating Geometric Shapes ---
+        const shapesGroup = new THREE.Group();
+        const geometries = [
+            new THREE.IcosahedronGeometry(0.5, 1),
+            new THREE.TorusKnotGeometry(0.3, 0.1, 80, 16),
+            new THREE.OctahedronGeometry(0.4, 0),
+            new THREE.TorusGeometry(0.35, 0.1, 32, 60),
+            new THREE.DodecahedronGeometry(0.35, 0),
+            new THREE.SphereGeometry(0.3, 32, 32),
+        ];
+        const shapeMeshes = [];
+        geometries.forEach((geo, i) => {
+            const mat = new THREE.MeshPhysicalMaterial({
+                color: new THREE.Color().setHSL(i * 0.13 + 0.55, 0.8, 0.55),
+                metalness: 0.1,
+                roughness: 0.25,
+                emissive: new THREE.Color().setHSL(i * 0.13 + 0.55, 0.9, 0.15),
+                emissiveIntensity: 0.5,
+                transparent: true,
+                opacity: 0.7,
+                wireframe: i % 2 === 0,
+            });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(
+                (Math.random() - 0.5) * 9,
+                (Math.random() - 0.5) * 6,
+                (Math.random() - 0.5) * 5 - 1
+            );
+            mesh.userData = {
+                rotSpeed: {
+                    x: (Math.random() - 0.5) * 0.6,
+                    y: (Math.random() - 0.5) * 0.6,
+                    z: (Math.random() - 0.5) * 0.3,
+                },
+                floatSpeed: 0.3 + Math.random() * 0.7,
+                floatAmp: 0.3 + Math.random() * 1.2,
+                initialY: mesh.position.y,
+                orbitRadius: 0.5 + Math.random() * 3,
+                orbitSpeed: 0.1 + Math.random() * 0.4,
+                orbitAngle: Math.random() * Math.PI * 2,
+            };
+            shapesGroup.add(mesh);
+            shapeMeshes.push(mesh);
+        });
+        scene.add(shapesGroup);
+
+        // --- Lighting ---
+        const ambientLight = new THREE.AmbientLight(0x222244, 1.2);
+        scene.add(ambientLight);
+        const pointLight1 = new THREE.PointLight(0x00f0ff, 30, 15);
+        pointLight1.position.set(4, 2, 4);
+        scene.add(pointLight1);
+        const pointLight2 = new THREE.PointLight(0xb347ea, 25, 15);
+        pointLight2.position.set(-4, -1, 3);
+        scene.add(pointLight2);
+
+        // --- Mouse Tracking ---
+        const mouse = { x: 0, y: 0, targetX: 0, targetY: 0 };
+        window.addEventListener('mousemove', (e) => {
+            mouse.targetX = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.targetY = -(e.clientY / window.innerHeight) * 2 + 1;
+        });
+        window.addEventListener('touchmove', (e) => {
+            const touch = e.touches[0];
+            mouse.targetX = (touch.clientX / window.innerWidth) * 2 - 1;
+            mouse.targetY = -(touch.clientY / window.innerHeight) * 2 + 1;
+        }, { passive: true });
+
+        // --- Animation Loop ---
+        const clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            const dt = Math.min(clock.getDelta(), 0.1);
+            const elapsed = performance.now() * 0.001;
+
+            // Smooth mouse follow
+            mouse.x += (mouse.targetX - mouse.x) * 3 * dt;
+            mouse.y += (mouse.targetY - mouse.y) * 3 * dt;
+
+            // Rotate starfield slowly
+            stars.rotation.x += 0.03 * dt;
+            stars.rotation.y += 0.05 * dt;
+            stars.rotation.z += 0.01 * dt;
+
+            // Camera follows mouse
+            camera.position.x += (mouse.x * 1.2 - camera.position.x) * 2 * dt;
+            camera.position.y += (mouse.y * 0.8 - camera.position.y) * 2 * dt;
+            camera.lookAt(0, 0, 0);
+
+            // Animate shapes
+            shapeMeshes.forEach(mesh => {
+                mesh.rotation.x += mesh.userData.rotSpeed.x * dt;
+                mesh.rotation.y += mesh.userData.rotSpeed.y * dt;
+                mesh.rotation.z += mesh.userData.rotSpeed.z * dt;
+                mesh.userData.orbitAngle += mesh.userData.orbitSpeed * dt;
+                const oa = mesh.userData.orbitAngle;
+                mesh.position.x += Math.cos(oa) * mesh.userData.orbitRadius * 0.3 * dt;
+                mesh.position.y =
+                    mesh.userData.initialY + Math.sin(elapsed * mesh.userData.floatSpeed) * mesh.userData
+                    .floatAmp;
+                mesh.position.z += Math.sin(oa) * mesh.userData.orbitRadius * 0.3 * dt;
+            });
+
+            // Dynamic light colors
+            const hueShift = Math.sin(elapsed * 0.3) * 0.1;
+            pointLight1.intensity = 28 + Math.sin(elapsed * 1.5) * 6;
+            pointLight2.intensity = 23 + Math.cos(elapsed * 1.3) * 5;
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // --- Resize Handler ---
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // ==================== Header Scroll Effect ====================
+        window.addEventListener('scroll', () => {
+            header.classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        // ==================== Mobile Menu Toggle ====================
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('active');
+            navLinks.classList.toggle('active');
+            document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
+        });
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                menuToggle.classList.remove('active');
+                navLinks.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        });
+
+        // ==================== Initialize Cart UI ====================
+        updateCartUI();
+
+        // ==================== Smooth Scroll for Safari ====================
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        console.log('%c🚀 NebulaStore %cجاهز | %cأي شيء تتخيله... نجده لك',
+            'font-size:1.4em;font-weight:bold;color:#00f0ff;',
+            'font-size:1em;color:#fff;',
+            'font-size:0.9em;color:#b347ea;');
+        console.log('%c🪐 Three.js 3D Scene | %cGlassmorphism UI | %c3D Tilt Cards | %cRipple Effects | %cParticle Starfield',
+            'color:#ff2d95;', 'color:#00f0ff;', 'color:#b347ea;', 'color:#4d7cff;', 'color:#fff;');
+    </script>
+</body>
+</html>
